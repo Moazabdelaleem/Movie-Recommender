@@ -50,24 +50,29 @@ export const Colors = {
   }
 } as const;
 
+export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+
 export const Fonts = Platform.select({
   ios: {
     bold: 'Poppins-Bold',
     regular: 'Poppins-Regular',
     secondary: 'Inter-Regular',
     sans: 'system-ui',
+    mono: 'ui-monospace',
   },
   default: {
     bold: 'sans-serif-medium',
     regular: 'sans-serif',
     secondary: 'sans-serif-light',
     sans: 'sans-serif',
+    mono: 'monospace',
   },
   web: {
     bold: 'Poppins, -apple-system, BlinkMacSystemFont, sans-serif',
     regular: 'Poppins, -apple-system, BlinkMacSystemFont, sans-serif',
     secondary: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
     sans: 'Poppins, sans-serif',
+    mono: 'monospace',
   },
 });
 
