@@ -47,22 +47,17 @@ function fnv1aHash(str) {
 /**
  * Generates a 128-dimensional normalized feature vector for a movie
  * @param {Object} movie
- * @param {Array<number|Object>} movie.genres - Genre IDs or objects with id property
- * @param {number} movie.runtime - Runtime in minutes
- * @param {number} movie.vote_average - Vote average (0 - 10)
- * @param {Array<string>} movie.cast_members - Array of actor names
- * @param {string} movie.director - Director name
  * @returns {Array<number>} 128-float array formatted for pgvector
  */
 function generateMovieFeatureVector(movie) {
   const vector = new Array(VECTOR_DIM).fill(0.0);
 
-  // 1. Encode Genres (Indices 0 - 18)
+  // 1. Encode Genres (Indices 0 - 18) — Higher weight (1.5) as primary taste signal
   if (Array.isArray(movie.genres)) {
     movie.genres.forEach(g => {
       const genreId = typeof g === 'object' ? g.id : Number(g);
       if (GENRE_MAP[genreId] !== undefined) {
-        vector[GENRE_MAP[genreId]] = 1.0;
+        vector[GENRE_MAP[genreId]] = 1.5;
       }
     });
   }
@@ -83,19 +78,18 @@ function generateMovieFeatureVector(movie) {
     }
   }
 
-  // 5. Hashed Cast & Director Embeddings (Indices 22 - 127)
+  // 5. Hashed Cast & Director Embeddings (Indices 22 - 127) — Moderate weight (0.6 - 0.3)
   if (movie.director) {
     const directorHash = fnv1aHash(movie.director.toLowerCase().trim()) % HASH_BUCKET_SIZE;
-    vector[HASH_BUCKET_OFFSET + directorHash] += 1.5; // Higher weight for director
+    vector[HASH_BUCKET_OFFSET + directorHash] += 0.6;
   }
 
   if (Array.isArray(movie.cast_members)) {
     movie.cast_members.slice(0, 5).forEach((actor, idx) => {
       if (typeof actor === 'string') {
         const actorHash = fnv1aHash(actor.toLowerCase().trim()) % HASH_BUCKET_SIZE;
-        // Weight top cast member higher
-        const weight = 1.0 - (idx * 0.15);
-        vector[HASH_BUCKET_OFFSET + actorHash] += weight;
+        const weight = 0.4 - (idx * 0.08);
+        vector[HASH_BUCKET_OFFSET + actorHash] += Math.max(0.1, weight);
       }
     });
   }

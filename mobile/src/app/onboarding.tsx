@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { COLD_START_MOVIES } from '@/constants/mockData';
 import { Colors } from '@/constants/theme';
 import GradientButton from '@/components/GradientButton';
+import { computeUserTasteVector, UserRating } from '@/services/tasteEngine';
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -14,6 +15,21 @@ export default function OnboardingScreen() {
   };
 
   const selectedCount = Object.values(selectedIds).filter(Boolean).length;
+
+  const handleProceed = () => {
+    // Generate user ratings array from selections
+    const ratings: UserRating[] = COLD_START_MOVIES.map(movie => ({
+      tmdb_id: movie.tmdb_id,
+      rating_type: selectedIds[movie.tmdb_id] ? 'thumbs_up' : 'thumbs_down',
+      movie
+    }));
+
+    // Compute 128-dim taste vector
+    const tasteVec = computeUserTasteVector(ratings);
+    console.log('Computed Taste Vector length:', tasteVec.length);
+
+    router.push('/filter');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -67,7 +83,7 @@ export default function OnboardingScreen() {
       <View style={styles.footer}>
         <GradientButton 
           title={selectedCount > 0 ? `Looks good (${selectedCount})` : 'Looks good'} 
-          onPress={() => router.push('/filter')} 
+          onPress={handleProceed} 
         />
       </View>
     </SafeAreaView>
