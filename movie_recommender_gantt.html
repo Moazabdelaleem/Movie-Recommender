@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Movie Recommender — Gantt Chart</title>
+<style>
+  :root {
+    --bg: #12141a;
+    --panel: #1a1d26;
+    --grid: #2a2e3a;
+    --text: #e8e9ed;
+    --muted: #8a8f9c;
+    --p1: #6c8ef5;
+    --p2: #7ed9a8;
+    --p3: #f5c86c;
+    --p4: #e08ae0;
+    --p5: #f57a7a;
+    --p6: #6cd4f5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 32px;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+  .chart {
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 20px;
+    overflow-x: auto;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    align-items: center;
+    min-height: 34px;
+    border-bottom: 1px solid var(--grid);
+  }
+  .row.header { border-bottom: 2px solid var(--grid); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .row.subtask .label { color: var(--muted); font-size: 12px; padding-left: 14px; }
+  .label { font-size: 13px; padding-right: 12px; white-space: nowrap; }
+  .track {
+    position: relative;
+    height: 22px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+  }
+  .track .cell { border-right: 1px solid var(--grid); }
+  .track .cell:last-child { border-right: none; }
+  .header .track .cell { text-align: center; font-size: 11px; color: var(--muted); border-right: none; }
+  .bar {
+    position: absolute;
+    top: 2px;
+    height: 18px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #0d0e12;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .bar.thin { height: 10px; top: 6px; opacity: 0.85; }
+  .legend { display: flex; gap: 16px; margin-top: 20px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .note { margin-top: 18px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .note b { color: var(--text); }
+</style>
+</head>
+<body>
+
+<h1>Movie Recommender — Project Timeline</h1>
+<div class="subtitle">20-25 hrs/week · agent-assisted build · ~5-week estimate (3 wks active build + 2 wk friend-test window)</div>
+
+<div class="chart">
+
+  <div class="row header">
+    <div></div>
+    <div class="track" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="cell">Week 1</div><div class="cell">Week 2</div><div class="cell">Week 3</div>
+      <div class="cell">Week 4</div><div class="cell">Week 5</div>
+    </div>
+  </div>
+
+  <!-- Phase 1 -->
+  <div class="row">
+    <div class="label">Phase 1 — Schema</div>
+    <div class="track" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div>
+      <div class="bar" style="left:0%; width:12%; background:var(--p1);">Schema</div>
+    </div>
+  </div>
+  <div class="row subtask">
+    <div class="label">4.1 App scaffold (parallel)</div>
+    <div class="track" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div>
+      <div class="bar thin" style="left:0%; width:8%; background:var(--p4);"></div>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="row">
+    <div class="label">Phase 2 — Taste engine</div>
+    <div class="track" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div>
+      <div class="bar" style="left:12%; width:16%; background:var(--p2);">Taste engine</div>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="row subtask">
+    <div class="label">Phase 3 — Filters (parallel)</div>
+    <div class="track" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div>
+      <div class="bar thin" style="left:12%; width:12%; background:var(--p3);"></div>
+    </div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="row">
+    <div class="label">Phase 4 — Swipe UI</div>
+    <div class="track" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div>
+      <div class="bar" style="left:28%; width:20%; background:var(--p4);">Swipe UI</div>
+    </div>
+  </div>
+
+  <!-- Phase 5 -->
+  <div class="row">
+    <div class="label">Phase 5 — Auth/Deploy</div>
+    <div class="track" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div>
+      <div class="bar" style="left:48%; width:8%; background:var(--p5);">Deploy</div>
+    </div>
+  </div>
+
+  <!-- Phase 6 -->
+  <div class="row">
+    <div class="label">Phase 6 — Friend test</div>
+    <div class="track" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div>
+      <div class="bar" style="left:56%; width:44%; background:var(--p6);">Testing & fix (incl. passive window)</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="legend">
+  <span><span class="swatch" style="background:var(--p1);"></span>Schema</span>
+  <span><span class="swatch" style="background:var(--p2);"></span>Taste engine</span>
+  <span><span class="swatch" style="background:var(--p3);"></span>Filters</span>
+  <span><span class="swatch" style="background:var(--p4);"></span>Swipe UI</span>
+  <span><span class="swatch" style="background:var(--p5);"></span>Auth/Deploy</span>
+  <span><span class="swatch" style="background:var(--p6);"></span>Testing</span>
+</div>
+
+<div class="note">
+  <b>Assumes:</b> 20-25 hrs/week held steady for 3 weeks of active build, then a lighter-effort 2-week friend-testing window.<br>
+  <b>Parallel tracks:</b> app scaffold (4.1) starts week 1 alongside schema work. Filter logic (Phase 3) overlaps the taste engine build since it doesn't block it.<br>
+  <b>Real risk:</b> 20-25 hrs/week on top of job hunt + WQU + client work is a heavy stack. If a week drops to 10-15hrs, this slips to ~6-7 weeks — not catastrophic, but don't be surprised.<br>
+  <b>Hard rule:</b> Phase 1 is not allowed to compress — it's the one phase where rework later is expensive.
+</div>
+
+</body>
+</html>
