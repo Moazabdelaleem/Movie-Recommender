@@ -3,9 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } fr
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import GradientButton from '@/components/GradientButton';
+import { COLD_START_MOVIES } from '@/constants/mockData';
+import { buildFilterCriteria, filterMoviePool } from '@/services/filterEngine';
 
 interface FilterOption {
-  id: string;
+  id: 'short' | 'focus' | 'energy' | 'mood';
   icon: string;
   title: string;
   options: string[];
@@ -34,12 +36,32 @@ export default function FilterScreen() {
     }));
   };
 
+  // Calculate Filter Criteria and candidate pool count in real-time
+  const filterCriteria = buildFilterCriteria({
+    shortIndex: selectedOptions.short,
+    focusIndex: selectedOptions.focus,
+    energyIndex: selectedOptions.energy,
+    moodIndex: selectedOptions.mood,
+  });
+
+  const candidatePool = filterMoviePool(COLD_START_MOVIES, filterCriteria);
+
+  const handleStartSwiping = () => {
+    router.push({
+      pathname: '/swipe',
+      params: {
+        maxRuntime: filterCriteria.maxRuntime ? String(filterCriteria.maxRuntime) : '',
+        includeGenres: filterCriteria.includeGenres ? filterCriteria.includeGenres.join(',') : '',
+      }
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header matching Brand Board */}
       <View style={styles.header}>
         <Text style={styles.title}>What's the vibe?</Text>
-        <Text style={styles.subtitle}>Pick 1 or more</Text>
+        <Text style={styles.subtitle}>Pick 1 or more • {candidatePool.length} candidates ready</Text>
       </View>
 
       {/* Stacked Rows matching Brand Board */}
@@ -71,12 +93,12 @@ export default function FilterScreen() {
         })}
       </ScrollView>
 
-      {/* Bottom Floating Circular Gradient Button matching Brand Board (Icon only, no text) */}
+      {/* Bottom Floating Circular Gradient Button matching Brand Board */}
       <View style={styles.footerCircle}>
         <GradientButton 
           variant="circle" 
           size={64} 
-          onPress={() => router.push('/swipe')}
+          onPress={handleStartSwiping}
         >
           <Text style={styles.arrowIcon}>→</Text>
         </GradientButton>

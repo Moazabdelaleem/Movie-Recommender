@@ -1,16 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView } from 'react-native';
-import { useRouter } from 'expo-router';
-import { MOCK_SWIPE_CANDIDATES } from '@/constants/mockData';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { MOCK_SWIPE_CANDIDATES, COLD_START_MOVIES } from '@/constants/mockData';
 import { Colors } from '@/constants/theme';
 import GradientButton from '@/components/GradientButton';
+import { filterMoviePool } from '@/services/filterEngine';
 
 export default function SwipeDeckScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const currentMovie = MOCK_SWIPE_CANDIDATES[currentIndex];
-  const isDeckEmpty = currentIndex >= MOCK_SWIPE_CANDIDATES.length;
+  const maxRuntimeParam = params.maxRuntime ? parseInt(params.maxRuntime as string, 10) : undefined;
+  const includeGenresParam = params.includeGenres ? (params.includeGenres as string).split(',') : undefined;
+
+  // Combine candidates & filter based on parameters
+  const candidateDeck = useMemo(() => {
+    const allCandidates = [...MOCK_SWIPE_CANDIDATES, ...COLD_START_MOVIES];
+    return filterMoviePool(allCandidates, {
+      maxRuntime: maxRuntimeParam,
+      includeGenres: includeGenresParam,
+    });
+  }, [maxRuntimeParam, includeGenresParam]);
+
+  const currentMovie = candidateDeck[currentIndex];
+  const isDeckEmpty = currentIndex >= candidateDeck.length;
 
   const handleAccept = () => {
     if (currentMovie) {
@@ -51,7 +65,7 @@ export default function SwipeDeckScreen() {
       {/* Header matching Brand Board */}
       <View style={styles.header}>
         <Text style={styles.title}>Swipe</Text>
-        <Text style={styles.subtitle}>Right for yes, left for no</Text>
+        <Text style={styles.subtitle}>Right for yes, left for no ({currentIndex + 1}/{candidateDeck.length})</Text>
       </View>
 
       {/* Full-Bleed Poster Card with Minimal Title Overlay (Title ONLY) */}
