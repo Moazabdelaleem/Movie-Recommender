@@ -1,63 +1,73 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * CUE Visual Identity Spec
+ * Exact hex values & theme tokens
  */
 
 import '@/global.css';
-
 import { Platform } from 'react-native';
 
 export const Colors = {
-  light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-    primary: '#6C5CE7',
-    thumbsUp: '#00B894',
-    thumbsDown: '#FF7675',
-    starGold: '#FDCB6E',
-    cardBg: '#FFFFFF',
-  },
-  dark: {
-    text: '#FFFFFF',
-    background: '#0D0E12',
-    backgroundElement: '#181A20',
-    backgroundSelected: '#262933',
-    textSecondary: '#9A9FAE',
-    primary: '#8C7AE6',
-    thumbsUp: '#00B894',
-    thumbsDown: '#FF7675',
-    starGold: '#FDCB6E',
-    cardBg: '#1A1D26',
-  },
-} as const;
+  // Brand exact hex values
+  primaryPink: '#FF5A7D',
+  primaryPurple: '#7B61FF',
+  surfaceDark: '#1E1E24',
+  background: '#121217',
+  textLight: '#F4F4F2',
+  textMuted: '#8D8D96',
 
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+  // Gradient helper
+  gradient: {
+    start: '#FF5A7D',
+    end: '#7B61FF',
+  },
+
+  // Light / Dark themes mapping to CUE tokens
+  dark: {
+    text: '#F4F4F2',
+    background: '#121217',
+    backgroundElement: '#1E1E24',
+    backgroundSelected: '#2A2A33',
+    textSecondary: '#8D8D96',
+    primary: '#FF5A7D',
+    primaryGradientStart: '#FF5A7D',
+    primaryGradientEnd: '#7B61FF',
+    cardBg: '#1E1E24',
+    heartBtn: '#FF5A7D',
+    rejectBtn: '#1E1E24',
+  },
+  light: {
+    text: '#F4F4F2',
+    background: '#121217',
+    backgroundElement: '#1E1E24',
+    backgroundSelected: '#2A2A33',
+    textSecondary: '#8D8D96',
+    primary: '#FF5A7D',
+    primaryGradientStart: '#FF5A7D',
+    primaryGradientEnd: '#7B61FF',
+    cardBg: '#1E1E24',
+    heartBtn: '#FF5A7D',
+    rejectBtn: '#1E1E24',
+  }
+} as const;
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
+    bold: 'Poppins-Bold',
+    regular: 'Poppins-Regular',
+    secondary: 'Inter-Regular',
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
   },
   default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
+    bold: 'sans-serif-medium',
+    regular: 'sans-serif',
+    secondary: 'sans-serif-light',
+    sans: 'sans-serif',
   },
   web: {
-    sans: 'var(--font-display)',
-    serif: 'var(--font-serif)',
-    rounded: 'var(--font-rounded)',
-    mono: 'var(--font-mono)',
+    bold: 'Poppins, -apple-system, BlinkMacSystemFont, sans-serif',
+    regular: 'Poppins, -apple-system, BlinkMacSystemFont, sans-serif',
+    secondary: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+    sans: 'Poppins, sans-serif',
   },
 });
 

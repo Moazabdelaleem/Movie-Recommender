@@ -1,89 +1,74 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLD_START_MOVIES } from '@/constants/mockData';
 import { Colors } from '@/constants/theme';
+import GradientButton from '@/components/GradientButton';
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [userRatings, setUserRatings] = useState<Record<number, 'thumbs_up' | 'thumbs_down'>>({});
+  const [selectedIds, setSelectedIds] = useState<Record<number, boolean>>({});
 
-  const currentMovie = COLD_START_MOVIES[currentIndex];
-  const isFinished = currentIndex >= COLD_START_MOVIES.length;
-
-  const handleRate = (ratingType: 'thumbs_up' | 'thumbs_down') => {
-    if (currentMovie) {
-      setUserRatings(prev => ({ ...prev, [currentMovie.tmdb_id]: ratingType }));
-    }
-    if (currentIndex + 1 >= COLD_START_MOVIES.length) {
-      // Finished onboarding -> proceed to filter step
-      router.push('/filter');
-    } else {
-      setCurrentIndex(prev => prev + 1);
-    }
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  if (isFinished || !currentMovie) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.finishedBox}>
-          <Text style={styles.finishedTitle}>Taste Profile Built! 🎉</Text>
-          <Text style={styles.finishedSub}>Your silent taste vector is computed. Ready to filter and swipe.</Text>
-          <TouchableOpacity style={styles.primaryBtn} onPress={() => router.push('/filter')}>
-            <Text style={styles.btnText}>Proceed to Filters →</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  const posterUri = `https://image.tmdb.org/t/p/w500${currentMovie.poster_path}`;
+  const selectedCount = Object.values(selectedIds).filter(Boolean).length;
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header matching Brand Board */}
       <View style={styles.header}>
-        <Text style={styles.progressText}>Taste Onboarding ({currentIndex + 1} / {COLD_START_MOVIES.length})</Text>
-        <View style={styles.progressBarBg}>
-          <View 
-            style={[
-              styles.progressBarFill, 
-              { width: `${((currentIndex + 1) / COLD_START_MOVIES.length) * 100}%` }
-            ]} 
-          />
-        </View>
+        <Text style={styles.title}>Let's get a feel</Text>
+        <Text style={styles.subtitle}>Rate a few movies you've seen and liked.</Text>
       </View>
 
-      {/* Movie Card */}
-      <View style={styles.cardContainer}>
-        <Image 
-          source={{ uri: posterUri }} 
-          style={styles.poster} 
-          resizeMode="cover"
+      {/* 3-Column Poster Grid */}
+      <ScrollView contentContainerStyle={styles.gridContainer} showsVerticalScrollIndicator={false}>
+        <View style={styles.grid}>
+          {COLD_START_MOVIES.map(movie => {
+            const isSelected = !!selectedIds[movie.tmdb_id];
+            const posterUri = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+
+            return (
+              <TouchableOpacity
+                key={movie.tmdb_id}
+                style={[
+                  styles.posterCard,
+                  isSelected && styles.posterCardSelected
+                ]}
+                activeOpacity={0.8}
+                onPress={() => toggleSelect(movie.tmdb_id)}
+              >
+                <Image 
+                  source={{ uri: posterUri }} 
+                  style={styles.posterImage} 
+                  resizeMode="cover" 
+                />
+
+                {isSelected && (
+                  <View style={styles.selectedOverlay}>
+                    <View style={styles.checkCircle}>
+                      <Text style={styles.checkChar}>✓</Text>
+                    </View>
+                  </View>
+                )}
+
+                <Text style={styles.movieTitle} numberOfLines={1}>
+                  {movie.title}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </ScrollView>
+
+      {/* Bottom CTA Pill matching Brand Board */}
+      <View style={styles.footer}>
+        <GradientButton 
+          title={selectedCount > 0 ? `Looks good (${selectedCount})` : 'Looks good'} 
+          onPress={() => router.push('/filter')} 
         />
-        <View style={styles.metaOverlay}>
-          <Text style={styles.movieTitle}>{currentMovie.title}</Text>
-          <Text style={styles.movieSub}>{currentMovie.release_date} • {currentMovie.genres.join(', ')}</Text>
-        </View>
-      </View>
-
-      {/* Action Buttons: Thumbs Up / Down */}
-      <View style={styles.actionRow}>
-        <TouchableOpacity 
-          style={[styles.rateBtn, { backgroundColor: 'rgba(255, 118, 117, 0.15)', borderColor: Colors.dark.thumbsDown }]}
-          onPress={() => handleRate('thumbs_down')}
-        >
-          <Text style={styles.btnEmoji}>👎</Text>
-          <Text style={[styles.rateBtnText, { color: Colors.dark.thumbsDown }]}>Dislike</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.rateBtn, { backgroundColor: 'rgba(0, 184, 148, 0.15)', borderColor: Colors.dark.thumbsUp }]}
-          onPress={() => handleRate('thumbs_up')}
-        >
-          <Text style={styles.btnEmoji}>👍</Text>
-          <Text style={[styles.rateBtnText, { color: Colors.dark.thumbsUp }]}>Liked It</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -92,109 +77,86 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.background,
-    paddingHorizontal: 20,
-    justifyContent: 'space-between',
+    backgroundColor: Colors.background,
   },
   header: {
-    marginTop: 20,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 16,
   },
-  progressText: {
-    color: Colors.dark.textSecondary,
-    fontSize: 13,
-    fontWeight: '600',
-    marginBottom: 8,
-    textAlign: 'center',
+  title: {
+    fontSize: 26,
+    fontWeight: '900',
+    color: Colors.textLight,
+    letterSpacing: -0.5,
   },
-  progressBarBg: {
-    height: 6,
-    backgroundColor: Colors.dark.backgroundElement,
-    borderRadius: 3,
+  subtitle: {
+    fontSize: 14,
+    color: Colors.textMuted,
+    marginTop: 4,
+  },
+  gridContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 100,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'space-between',
+  },
+  posterCard: {
+    width: '30%',
+    aspectRatio: 0.65,
+    borderRadius: 12,
     overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: Colors.dark.primary,
-  },
-  cardContainer: {
-    flex: 1,
-    marginVertical: 20,
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: Colors.dark.cardBg,
+    backgroundColor: Colors.surfaceDark,
     position: 'relative',
+    borderWidth: 2,
+    borderColor: 'transparent',
+    marginBottom: 6,
   },
-  poster: {
+  posterCardSelected: {
+    borderColor: Colors.primaryPink,
+  },
+  posterImage: {
     width: '100%',
-    height: '100%',
+    height: '80%',
   },
-  metaOverlay: {
+  movieTitle: {
+    color: Colors.textLight,
+    fontSize: 10,
+    fontWeight: '700',
+    textAlign: 'center',
+    paddingVertical: 4,
+    paddingHorizontal: 2,
+  },
+  selectedOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 90, 125, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Colors.primaryPink,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkChar: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  footer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 16,
-    backgroundColor: 'rgba(13, 14, 18, 0.85)',
-  },
-  movieTitle: {
-    color: '#FFF',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  movieSub: {
-    color: Colors.dark.textSecondary,
-    fontSize: 13,
-    marginTop: 4,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 30,
-  },
-  rateBtn: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 10,
-  },
-  btnEmoji: {
-    fontSize: 22,
-  },
-  rateBtnText: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  finishedBox: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  finishedTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.dark.text,
-    marginBottom: 10,
-  },
-  finishedSub: {
-    fontSize: 14,
-    color: Colors.dark.textSecondary,
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  primaryBtn: {
-    backgroundColor: Colors.dark.primary,
     paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 12,
-  },
-  btnText: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    fontSize: 16,
+    paddingVertical: 20,
+    backgroundColor: 'rgba(18, 18, 23, 0.95)',
   },
 });

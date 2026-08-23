@@ -19,20 +19,20 @@ export default function WatchlistScreen() {
   const [savedItems, setSavedItems] = useState<SavedItem[]>([
     {
       id: '1',
-      title: 'Inception',
+      title: 'INCEPTION',
       poster_path: '/oYuLEW9SpB15k12C21Bf2RtfU4b.jpg',
       runtime: 148,
       swiped_at: '2 hours ago',
-      isUnlocked: true, // Runtime passed -> Unlocked!
+      isUnlocked: true,
       starRating: 0,
     },
     {
       id: '2',
-      title: 'Your Name',
+      title: 'YOUR NAME',
       poster_path: '/q719jXXEzOoYaps6babgKnONONX.jpg',
       runtime: 106,
       swiped_at: 'Just now',
-      isUnlocked: false, // Currently watching -> Locked
+      isUnlocked: false,
       starRating: 0,
     }
   ]);
@@ -44,11 +44,11 @@ export default function WatchlistScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Watchlist & Post-Watch Ratings</Text>
-        <Text style={styles.subtitle}>Rate 1–5 stars after finishing movies to refine your taste profile</Text>
+        <Text style={styles.title}>Post-Watch Ratings</Text>
+        <Text style={styles.subtitle}>Rate 1–5 stars after watching to refine your taste profile</Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.list}>
+      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
         {savedItems.map(item => (
           <View key={item.id} style={styles.itemCard}>
             <Image 
@@ -60,10 +60,10 @@ export default function WatchlistScreen() {
               <Text style={styles.itemTitle}>{item.title}</Text>
               <Text style={styles.itemMeta}>{item.runtime} mins • Saved {item.swiped_at}</Text>
 
-              {/* Unlocked Post-Watch Star Rating Widget */}
+              {/* Post-Watch Star Rating Widget */}
               {item.isUnlocked ? (
                 <View style={styles.ratingBox}>
-                  <Text style={styles.ratingHeader}>Rate this movie (1–5 Stars):</Text>
+                  <Text style={styles.ratingHeader}>Rate movie (1–5 Stars):</Text>
                   <View style={styles.starsRow}>
                     {[1, 2, 3, 4, 5].map(star => (
                       <TouchableOpacity 
@@ -82,14 +82,14 @@ export default function WatchlistScreen() {
                   </View>
                   {item.starRating > 0 && (
                     <Text style={styles.ratedSuccess}>
-                      Saved! {item.starRating} Stars added to taste vector ✨
+                      ✓ {item.starRating} Stars saved to taste vector
                     </Text>
                   )}
                 </View>
               ) : (
                 <View style={styles.lockedBox}>
                   <Text style={styles.lockedText}>
-                    🔒 Currently watching ({item.runtime}m duration)
+                    🔒 Watching now ({item.runtime}m)
                   </Text>
                   <Text style={styles.lockedSub}>Star rating unlocks after runtime passes</Text>
                 </View>
@@ -109,8 +109,8 @@ export default function WatchlistScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.background,
-    paddingHorizontal: 20,
+    backgroundColor: Colors.background,
+    paddingHorizontal: 24,
   },
   header: {
     marginTop: 20,
@@ -118,12 +118,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.dark.text,
+    fontWeight: '900',
+    color: Colors.textLight,
   },
   subtitle: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
+    color: Colors.textMuted,
     marginTop: 4,
   },
   list: {
@@ -132,8 +132,8 @@ const styles = StyleSheet.create({
   },
   itemCard: {
     flexDirection: 'row',
-    backgroundColor: Colors.dark.cardBg,
-    borderRadius: 14,
+    backgroundColor: Colors.surfaceDark,
+    borderRadius: 16,
     overflow: 'hidden',
     padding: 12,
     gap: 14,
@@ -141,32 +141,33 @@ const styles = StyleSheet.create({
   poster: {
     width: 80,
     height: 120,
-    borderRadius: 8,
+    borderRadius: 10,
   },
   itemDetails: {
     flex: 1,
     justifyContent: 'center',
   },
   itemTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: Colors.dark.text,
+    fontSize: 16,
+    fontWeight: '800',
+    color: Colors.textLight,
+    letterSpacing: 0.5,
   },
   itemMeta: {
     fontSize: 12,
-    color: Colors.dark.textSecondary,
+    color: Colors.textMuted,
     marginTop: 2,
     marginBottom: 10,
   },
   ratingBox: {
-    backgroundColor: Colors.dark.backgroundElement,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     padding: 8,
-    borderRadius: 8,
+    borderRadius: 10,
   },
   ratingHeader: {
     fontSize: 11,
     fontWeight: '600',
-    color: Colors.dark.textSecondary,
+    color: Colors.textMuted,
     marginBottom: 4,
   },
   starsRow: {
@@ -177,44 +178,44 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   starChar: {
-    fontSize: 22,
+    fontSize: 20,
   },
   starFilled: {
-    color: Colors.dark.starGold,
+    color: Colors.primaryPink,
   },
   starEmpty: {
-    color: '#44475A',
+    color: '#3A3A45',
   },
   ratedSuccess: {
     fontSize: 11,
-    color: Colors.dark.thumbsUp,
-    fontWeight: '600',
+    color: Colors.primaryPink,
+    fontWeight: '700',
     marginTop: 4,
   },
   lockedBox: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     padding: 8,
-    borderRadius: 8,
+    borderRadius: 10,
   },
   lockedText: {
     fontSize: 12,
-    color: Colors.dark.starGold,
-    fontWeight: '600',
+    color: Colors.primaryPurple,
+    fontWeight: '700',
   },
   lockedSub: {
     fontSize: 11,
-    color: Colors.dark.textSecondary,
+    color: Colors.textMuted,
     marginTop: 2,
   },
   backBtn: {
     marginVertical: 16,
     paddingVertical: 14,
-    backgroundColor: Colors.dark.backgroundElement,
-    borderRadius: 12,
+    backgroundColor: Colors.surfaceDark,
+    borderRadius: 28,
     alignItems: 'center',
   },
   backBtnText: {
-    color: Colors.dark.text,
-    fontWeight: 'bold',
+    color: Colors.textMuted,
+    fontWeight: '700',
   },
 });

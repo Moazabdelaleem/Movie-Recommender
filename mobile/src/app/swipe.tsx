@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView } from 'r
 import { useRouter } from 'expo-router';
 import { MOCK_SWIPE_CANDIDATES } from '@/constants/mockData';
 import { Colors } from '@/constants/theme';
+import GradientButton from '@/components/GradientButton';
 
 export default function SwipeDeckScreen() {
   const router = useRouter();
@@ -11,9 +12,8 @@ export default function SwipeDeckScreen() {
   const currentMovie = MOCK_SWIPE_CANDIDATES[currentIndex];
   const isDeckEmpty = currentIndex >= MOCK_SWIPE_CANDIDATES.length;
 
-  const handleSwipeRight = () => {
+  const handleAccept = () => {
     if (currentMovie) {
-      // Picked movie -> Navigate directly to decision screen!
       router.push({
         pathname: '/decision',
         params: {
@@ -26,23 +26,18 @@ export default function SwipeDeckScreen() {
     }
   };
 
-  const handleSwipeLeft = () => {
-    setCurrentIndex(prev => prev + 1);
-  };
-
-  const handleSwipeUp = () => {
-    // Marked as seen -> skip to next
+  const handleReject = () => {
     setCurrentIndex(prev => prev + 1);
   };
 
   if (isDeckEmpty || !currentMovie) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.emptyDeckBox}>
-          <Text style={styles.emptyTitle}>Deck Finished 🎬</Text>
-          <Text style={styles.emptySub}>No more candidates in this filter session. Reset filters to see more.</Text>
+        <View style={styles.emptyBox}>
+          <Text style={styles.emptyTitle}>Deck Finished</Text>
+          <Text style={styles.emptySub}>No more candidates in this vibe filter session.</Text>
           <TouchableOpacity style={styles.resetBtn} onPress={() => router.push('/filter')}>
-            <Text style={styles.resetBtnText}>Adjust Filters</Text>
+            <Text style={styles.resetBtnText}>Adjust Vibe Filters</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -53,48 +48,43 @@ export default function SwipeDeckScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.topHeader}>
-        <Text style={styles.deckProgress}>Candidate {currentIndex + 1} of {MOCK_SWIPE_CANDIDATES.length}</Text>
-        <Text style={styles.fastTip}>Swipe right or tap Watch to pick fast</Text>
+      {/* Header matching Brand Board */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Swipe</Text>
+        <Text style={styles.subtitle}>Right for yes, left for no</Text>
       </View>
 
-      {/* Swipe Card (POSTER + TITLE + RATING BADGE ONLY - NO TEXT PARAGRAPHS) */}
+      {/* Full-Bleed Poster Card with Minimal Title Overlay (Title ONLY) */}
       <View style={styles.card}>
         <Image 
           source={{ uri: posterUri }} 
-          style={styles.poster} 
+          style={styles.posterImage} 
           resizeMode="cover" 
         />
 
-        {/* Rating Badge top-right */}
-        <View style={styles.ratingBadge}>
-          <Text style={styles.starIcon}>★</Text>
-          <Text style={styles.ratingText}>{currentMovie.vote_average}</Text>
-        </View>
-
-        {/* Title Overlay at Bottom */}
+        {/* Minimal Title Overlay Bottom-Left */}
         <View style={styles.titleOverlay}>
-          <Text style={styles.movieTitle} numberOfLines={2}>{currentMovie.title}</Text>
-          <Text style={styles.movieRuntime}>{currentMovie.runtime} mins • {currentMovie.release_date}</Text>
+          <Text style={styles.movieTitle} numberOfLines={2}>
+            {currentMovie.title.toUpperCase()}
+          </Text>
         </View>
       </View>
 
-      {/* Swipe Action Control Buttons */}
-      <View style={styles.controlsRow}>
-        <TouchableOpacity style={styles.skipBtn} onPress={handleSwipeLeft}>
-          <Text style={styles.btnIcon}>❌</Text>
-          <Text style={styles.skipText}>Skip</Text>
+      {/* Bottom Circular Action Buttons (X reject, Gradient Heart accept) */}
+      <View style={styles.actionsRow}>
+        {/* Reject Circular Button X */}
+        <TouchableOpacity style={styles.rejectBtn} activeOpacity={0.8} onPress={handleReject}>
+          <Text style={styles.rejectIcon}>✕</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.seenBtn} onPress={handleSwipeUp}>
-          <Text style={styles.btnIcon}>👁️</Text>
-          <Text style={styles.seenText}>Seen It</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.pickBtn} onPress={handleSwipeRight}>
-          <Text style={styles.btnIcon}>🍿</Text>
-          <Text style={styles.pickText}>WATCH THIS</Text>
-        </TouchableOpacity>
+        {/* Accept Gradient Circular Heart Button */}
+        <GradientButton 
+          variant="circle" 
+          size={64} 
+          onPress={handleAccept}
+        >
+          <Text style={styles.heartIcon}>♥</Text>
+        </GradientButton>
       </View>
     </SafeAreaView>
   );
@@ -103,166 +93,110 @@ export default function SwipeDeckScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.background,
-    paddingHorizontal: 20,
+    backgroundColor: Colors.background,
     justifyContent: 'space-between',
   },
-  topHeader: {
-    marginTop: 14,
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 20,
     alignItems: 'center',
   },
-  deckProgress: {
-    color: Colors.dark.textSecondary,
-    fontSize: 12,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  title: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: Colors.textLight,
+    letterSpacing: -0.5,
   },
-  fastTip: {
-    color: Colors.dark.primary,
-    fontSize: 12,
-    fontWeight: '600',
+  subtitle: {
+    fontSize: 13,
+    color: Colors.textMuted,
     marginTop: 2,
   },
   card: {
     flex: 1,
-    marginVertical: 14,
-    borderRadius: 20,
+    marginHorizontal: 24,
+    marginVertical: 16,
+    borderRadius: 24,
     overflow: 'hidden',
-    backgroundColor: Colors.dark.cardBg,
+    backgroundColor: Colors.surfaceDark,
     position: 'relative',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 10,
   },
-  poster: {
+  posterImage: {
     width: '100%',
     height: '100%',
-  },
-  ratingBadge: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    backgroundColor: 'rgba(13, 14, 18, 0.85)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(253, 203, 110, 0.4)',
-  },
-  starIcon: {
-    color: Colors.dark.starGold,
-    fontSize: 14,
-  },
-  ratingText: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    fontSize: 14,
   },
   titleOverlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 20,
-    paddingTop: 30,
-    backgroundColor: 'rgba(13, 14, 18, 0.92)',
+    padding: 24,
+    paddingTop: 40,
+    backgroundColor: 'rgba(18, 18, 23, 0.85)',
   },
   movieTitle: {
-    color: '#FFF',
-    fontSize: 26,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-  },
-  movieRuntime: {
-    color: Colors.dark.textSecondary,
-    fontSize: 14,
-    fontWeight: '500',
-    marginTop: 4,
-  },
-  controlsRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
-  },
-  skipBtn: {
-    flex: 1,
-    backgroundColor: Colors.dark.backgroundElement,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-  },
-  skipText: {
-    color: Colors.dark.thumbsDown,
-    fontWeight: '700',
-    fontSize: 13,
-    marginTop: 4,
-  },
-  seenBtn: {
-    flex: 1,
-    backgroundColor: Colors.dark.backgroundElement,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-  },
-  seenText: {
-    color: Colors.dark.textSecondary,
-    fontWeight: '700',
-    fontSize: 13,
-    marginTop: 4,
-  },
-  pickBtn: {
-    flex: 2,
-    backgroundColor: Colors.dark.primary,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    shadowColor: Colors.dark.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  pickText: {
-    color: '#FFF',
+    color: Colors.textLight,
+    fontSize: 22,
     fontWeight: '900',
-    fontSize: 15,
-    marginTop: 2,
+    letterSpacing: 1,
+    lineHeight: 28,
   },
-  btnIcon: {
-    fontSize: 20,
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 40,
+    paddingBottom: 32,
+    paddingTop: 8,
   },
-  emptyDeckBox: {
+  rejectBtn: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: Colors.surfaceDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rejectIcon: {
+    color: Colors.textMuted,
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  heartIcon: {
+    color: Colors.textLight,
+    fontSize: 28,
+  },
+  emptyBox: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
   emptyTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.dark.text,
-    marginBottom: 10,
+    color: Colors.textLight,
+    marginBottom: 8,
   },
   emptySub: {
     fontSize: 14,
-    color: Colors.dark.textSecondary,
+    color: Colors.textMuted,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   resetBtn: {
-    backgroundColor: Colors.dark.primary,
-    paddingHorizontal: 24,
+    backgroundColor: Colors.surfaceDark,
+    paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 20,
   },
   resetBtnText: {
-    color: '#FFF',
-    fontWeight: 'bold',
+    color: Colors.textLight,
+    fontWeight: '700',
   },
 });

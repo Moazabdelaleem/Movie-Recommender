@@ -1,102 +1,85 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/theme';
+import GradientButton from '@/components/GradientButton';
+
+interface FilterOption {
+  id: string;
+  icon: string;
+  title: string;
+  options: string[];
+}
+
+const FILTER_ROWS: FilterOption[] = [
+  { id: 'short', icon: '⏱️', title: 'Short', options: ['Any runtime', '< 90 min', '< 110 min'] },
+  { id: 'focus', icon: '🎯', title: 'Focus', options: ['Something thoughtful', 'Easy watching', 'Mind-bending'] },
+  { id: 'energy', icon: '⚡', title: 'Energy', options: ['Medium', 'High energy', 'Low key / Relaxed'] },
+  { id: 'mood', icon: '😊', title: 'Mood', options: ["Doesn't matter", 'Feel good', 'Dark & Intense'] },
+];
 
 export default function FilterScreen() {
   const router = useRouter();
-  
-  // Filter 1: Runtime (<100 mins vs Any)
-  const [runtimeFilter, setRuntimeFilter] = useState<'short' | 'any'>('any');
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({
+    short: 0,
+    focus: 0,
+    energy: 0,
+    mood: 0,
+  });
 
-  // Filter 2: Energy (Chill / Zone Out vs Focus / Engage)
-  const [energyFilter, setEnergyFilter] = useState<'chill' | 'focus'>('chill');
-
-  // Calculate estimated candidate pool size
-  const poolSize = runtimeFilter === 'short' ? 12 : 24;
+  const cycleOption = (rowId: string, max: number) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [rowId]: (prev[rowId] + 1) % max,
+    }));
+  };
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header matching Brand Board */}
       <View style={styles.header}>
-        <Text style={styles.title}>2-Tap Filters</Text>
-        <Text style={styles.subtitle}>Narrow candidate pool instantly before swiping</Text>
+        <Text style={styles.title}>What's the vibe?</Text>
+        <Text style={styles.subtitle}>Pick 1 or more</Text>
       </View>
 
-      <View style={styles.questionsContainer}>
-        {/* Question 1: Duration */}
-        <View style={styles.questionCard}>
-          <Text style={styles.questionTitle}>1. Available Time</Text>
-          <View style={styles.optionsRow}>
-            <TouchableOpacity 
-              style={[
-                styles.optionBtn, 
-                runtimeFilter === 'short' && styles.optionSelected
-              ]}
-              onPress={() => setRuntimeFilter('short')}
-            >
-              <Text style={styles.optionEmoji}>⏱️</Text>
-              <Text style={[styles.optionText, runtimeFilter === 'short' && styles.optionTextSelected]}>
-                Short (&lt; 100 min)
-              </Text>
-            </TouchableOpacity>
+      {/* Stacked Rows matching Brand Board */}
+      <ScrollView contentContainerStyle={styles.rowsList} showsVerticalScrollIndicator={false}>
+        {FILTER_ROWS.map(row => {
+          const selectedIdx = selectedOptions[row.id] || 0;
+          const currentVal = row.options[selectedIdx];
 
-            <TouchableOpacity 
-              style={[
-                styles.optionBtn, 
-                runtimeFilter === 'any' && styles.optionSelected
-              ]}
-              onPress={() => setRuntimeFilter('any')}
+          return (
+            <TouchableOpacity
+              key={row.id}
+              style={styles.rowCard}
+              activeOpacity={0.8}
+              onPress={() => cycleOption(row.id, row.options.length)}
             >
-              <Text style={styles.optionEmoji}>🍿</Text>
-              <Text style={[styles.optionText, runtimeFilter === 'any' && styles.optionTextSelected]}>
-                Any Duration
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+              <View style={styles.rowLeft}>
+                <View style={styles.iconCircle}>
+                  <Text style={styles.iconEmoji}>{row.icon}</Text>
+                </View>
+                <View>
+                  <Text style={styles.rowTitle}>{row.title}</Text>
+                  <Text style={styles.rowSubtext}>{currentVal}</Text>
+                </View>
+              </View>
 
-        {/* Question 2: Energy / Mood */}
-        <View style={styles.questionCard}>
-          <Text style={styles.questionTitle}>2. Energy Level</Text>
-          <View style={styles.optionsRow}>
-            <TouchableOpacity 
-              style={[
-                styles.optionBtn, 
-                energyFilter === 'chill' && styles.optionSelected
-              ]}
-              onPress={() => setEnergyFilter('chill')}
-            >
-              <Text style={styles.optionEmoji}>😴</Text>
-              <Text style={[styles.optionText, energyFilter === 'chill' && styles.optionTextSelected]}>
-                Zone-Out / Easy
-              </Text>
+              <Text style={styles.chevron}>›</Text>
             </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
 
-            <TouchableOpacity 
-              style={[
-                styles.optionBtn, 
-                energyFilter === 'focus' && styles.optionSelected
-              ]}
-              onPress={() => setEnergyFilter('focus')}
-            >
-              <Text style={styles.optionEmoji}>🧠</Text>
-              <Text style={[styles.optionText, energyFilter === 'focus' && styles.optionTextSelected]}>
-                High Focus / Plot
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-
-      {/* Pool Summary & Start Swiping */}
-      <View style={styles.footer}>
-        <View style={styles.poolInfo}>
-          <Text style={styles.poolLabel}>Candidate Pool:</Text>
-          <Text style={styles.poolCount}>{poolSize} Movies</Text>
-        </View>
-        <TouchableOpacity style={styles.startBtn} onPress={() => router.push('/swipe')}>
-          <Text style={styles.startBtnText}>Start Swiping Deck →</Text>
-        </TouchableOpacity>
+      {/* Bottom Floating Circular Gradient Button matching Brand Board (Icon only, no text) */}
+      <View style={styles.footerCircle}>
+        <GradientButton 
+          variant="circle" 
+          size={64} 
+          onPress={() => router.push('/swipe')}
+        >
+          <Text style={styles.arrowIcon}>→</Text>
+        </GradientButton>
       </View>
     </SafeAreaView>
   );
@@ -105,102 +88,75 @@ export default function FilterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.background,
-    paddingHorizontal: 20,
-    justifyContent: 'space-between',
+    backgroundColor: Colors.background,
   },
   header: {
-    marginTop: 20,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 20,
   },
   title: {
     fontSize: 26,
-    fontWeight: 'bold',
-    color: Colors.dark.text,
+    fontWeight: '900',
+    color: Colors.textLight,
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 14,
-    color: Colors.dark.textSecondary,
+    color: Colors.textMuted,
     marginTop: 4,
   },
-  questionsContainer: {
-    gap: 24,
-    marginVertical: 20,
-  },
-  questionCard: {
-    backgroundColor: Colors.dark.cardBg,
-    padding: 18,
-    borderRadius: 16,
-  },
-  questionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.dark.text,
-    marginBottom: 14,
-  },
-  optionsRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  optionBtn: {
-    flex: 1,
-    backgroundColor: Colors.dark.backgroundElement,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: 'transparent',
-  },
-  optionSelected: {
-    borderColor: Colors.dark.primary,
-    backgroundColor: 'rgba(140, 122, 230, 0.15)',
-  },
-  optionEmoji: {
-    fontSize: 24,
-    marginBottom: 6,
-  },
-  optionText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.dark.textSecondary,
-    textAlign: 'center',
-  },
-  optionTextSelected: {
-    color: Colors.dark.text,
-    fontWeight: 'bold',
-  },
-  footer: {
-    marginBottom: 30,
+  rowsList: {
+    paddingHorizontal: 24,
     gap: 16,
   },
-  poolInfo: {
+  rowCard: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
+    backgroundColor: Colors.surfaceDark,
+    padding: 16,
+    borderRadius: 20,
+  },
+  rowLeft: {
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.dark.backgroundElement,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 10,
+    gap: 16,
   },
-  poolLabel: {
-    color: Colors.dark.textSecondary,
-    fontSize: 14,
-  },
-  poolCount: {
-    color: Colors.dark.primary,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  startBtn: {
-    backgroundColor: Colors.dark.primary,
-    paddingVertical: 16,
-    borderRadius: 14,
+  iconCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  startBtnText: {
-    color: '#FFF',
-    fontWeight: 'bold',
+  iconEmoji: {
+    fontSize: 18,
+  },
+  rowTitle: {
     fontSize: 16,
+    fontWeight: '700',
+    color: Colors.textLight,
+  },
+  rowSubtext: {
+    fontSize: 13,
+    color: Colors.textMuted,
+    marginTop: 2,
+  },
+  chevron: {
+    fontSize: 24,
+    color: Colors.textMuted,
+    fontWeight: '300',
+  },
+  footerCircle: {
+    alignItems: 'center',
+    paddingBottom: 32,
+    paddingTop: 16,
+  },
+  arrowIcon: {
+    fontSize: 28,
+    color: Colors.textLight,
+    fontWeight: 'bold',
   },
 });

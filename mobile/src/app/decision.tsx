@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Colors } from '@/constants/theme';
+import CueLogo from '@/components/Cuelogo';
+import GradientButton from '@/components/GradientButton';
 
 export default function DecisionScreen() {
   const router = useRouter();
@@ -14,32 +16,36 @@ export default function DecisionScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <CueLogo size="small" showWordmark={true} />
+      </View>
+
       <View style={styles.content}>
-        <View style={styles.successBadge}>
-          <Text style={styles.successEmoji}>🍿</Text>
-          <Text style={styles.successText}>Decision Made!</Text>
+        <View style={styles.decisionBadge}>
+          <Text style={styles.badgeText}>MATCH FOUND</Text>
         </View>
 
         <View style={styles.posterCard}>
           <Image source={{ uri: posterUri }} style={styles.poster} resizeMode="cover" />
           <View style={styles.cardInfo}>
             <Text style={styles.movieTitle}>{title}</Text>
-            <Text style={styles.runtimeInfo}>Duration: {runtime} minutes</Text>
+            <Text style={styles.runtimeInfo}>{runtime} mins</Text>
           </View>
         </View>
 
         <View style={styles.unlockNotice}>
           <Text style={styles.unlockTitle}>⏰ Post-Watch 1–5 Star Rating</Text>
           <Text style={styles.unlockDesc}>
-            Star rating unlocks in {runtime} mins once you finish watching. We'll send a rating reminder notification!
+            Unlocks in {runtime} mins once you finish watching. Star rating refines your taste profile for future decisions.
           </Text>
         </View>
       </View>
 
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.watchlistBtn} onPress={() => router.push('/watchlist')}>
-          <Text style={styles.watchlistBtnText}>View Saved Watchlist →</Text>
-        </TouchableOpacity>
+        <GradientButton 
+          title="View Saved Watchlist →" 
+          onPress={() => router.push('/watchlist')} 
+        />
 
         <TouchableOpacity style={styles.homeBtn} onPress={() => router.push('/')}>
           <Text style={styles.homeBtnText}>Back to Home</Text>
@@ -52,105 +58,93 @@ export default function DecisionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.background,
-    paddingHorizontal: 20,
+    backgroundColor: Colors.background,
+    paddingHorizontal: 24,
     justifyContent: 'space-between',
+  },
+  header: {
+    alignItems: 'center',
+    marginTop: 16,
   },
   content: {
     alignItems: 'center',
-    marginTop: 30,
+    marginVertical: 10,
   },
-  successBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(0, 184, 148, 0.15)',
+  decisionBadge: {
+    backgroundColor: 'rgba(255, 90, 125, 0.15)',
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingVertical: 6,
+    borderRadius: 16,
     marginBottom: 20,
   },
-  successEmoji: {
-    fontSize: 20,
-  },
-  successText: {
-    color: Colors.dark.thumbsUp,
-    fontWeight: 'bold',
-    fontSize: 16,
+  badgeText: {
+    color: Colors.primaryPink,
+    fontWeight: '800',
+    fontSize: 12,
+    letterSpacing: 1,
   },
   posterCard: {
     width: 220,
-    backgroundColor: Colors.dark.cardBg,
-    borderRadius: 16,
+    backgroundColor: Colors.surfaceDark,
+    borderRadius: 20,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   poster: {
     width: 220,
-    height: 310,
+    height: 300,
   },
   cardInfo: {
-    padding: 14,
+    padding: 16,
     alignItems: 'center',
   },
   movieTitle: {
-    color: Colors.dark.text,
+    color: Colors.textLight,
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   runtimeInfo: {
-    color: Colors.dark.textSecondary,
+    color: Colors.textMuted,
     fontSize: 13,
     marginTop: 4,
   },
   unlockNotice: {
-    backgroundColor: Colors.dark.backgroundElement,
+    backgroundColor: Colors.surfaceDark,
     padding: 16,
-    borderRadius: 14,
+    borderRadius: 16,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.dark.starGold,
+    borderLeftColor: Colors.primaryPurple,
   },
   unlockTitle: {
-    color: Colors.dark.starGold,
-    fontWeight: 'bold',
+    color: Colors.textLight,
+    fontWeight: '700',
     fontSize: 14,
     marginBottom: 4,
   },
   unlockDesc: {
-    color: Colors.dark.textSecondary,
+    color: Colors.textMuted,
     fontSize: 13,
     lineHeight: 18,
   },
   actions: {
     gap: 12,
-    marginBottom: 30,
-  },
-  watchlistBtn: {
-    backgroundColor: Colors.dark.primary,
-    paddingVertical: 16,
-    borderRadius: 14,
-    alignItems: 'center',
-  },
-  watchlistBtnText: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    fontSize: 16,
+    marginBottom: 28,
   },
   homeBtn: {
-    backgroundColor: Colors.dark.backgroundElement,
+    backgroundColor: Colors.surfaceDark,
     paddingVertical: 14,
-    borderRadius: 14,
+    borderRadius: 28,
     alignItems: 'center',
   },
   homeBtnText: {
-    color: Colors.dark.textSecondary,
+    color: Colors.textMuted,
     fontWeight: '600',
     fontSize: 15,
   },
