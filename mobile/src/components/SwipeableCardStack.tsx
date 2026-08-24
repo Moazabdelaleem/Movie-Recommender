@@ -110,7 +110,11 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   card: {
-    ...StyleSheet.absoluteFill,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     borderRadius: 24,
     overflow: 'hidden',
     backgroundColor: Colors.surfaceDark,

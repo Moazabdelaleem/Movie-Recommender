@@ -148,7 +148,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   selectedOverlay: {
-    ...StyleSheet.absoluteFill,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(255, 90, 125, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
